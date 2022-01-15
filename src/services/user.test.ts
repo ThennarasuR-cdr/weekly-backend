@@ -3,10 +3,10 @@ import mongoose from 'mongoose';
 import User from '../models/user';
 import { findUserByEmail, findUserById } from './user';
 
-describe('User service', () => {
-	const findByIdSpy = jest.spyOn(User, 'findById');
-	const findOneSpy = jest.spyOn(User, 'findOne');
+const findByIdSpy = jest.spyOn(User, 'findById');
+const findOneSpy = jest.spyOn(User, 'findOne');
 
+describe('User service', () => {
 	describe('find User by id', () => {
 		const expectedUser = { id: 'name', email: 'username@mail.com', password: 'password' };
 		findByIdSpy.mockResolvedValue(expectedUser);

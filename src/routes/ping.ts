@@ -2,7 +2,7 @@ import express from 'express';
 
 const router = express.Router();
 
-router.get('/', (req, res, next): void => {
+router.get('/', (_, res): void => {
 	res.send({ status: 200, message: 'Ping' });
 });
 

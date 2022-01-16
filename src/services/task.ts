@@ -23,3 +23,9 @@ export const getTasks = async (email: string): Promise<task[]> => {
 
 	return mappedTasks;
 };
+
+export const deleteTask = async (taskId: string): Promise<void> => {
+	await Task.deleteOne({ _id: taskId });
+
+	return;
+};

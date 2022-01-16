@@ -1,8 +1,9 @@
 import Task from '../models/task';
-import { createTask, getTasks } from './task';
+import { createTask, deleteTask, getTasks } from './task';
 
 const createTaskSpy = jest.spyOn(Task, 'create');
 const findTaskSpy = jest.spyOn(Task, 'find');
+const deleteTaskSpy = jest.spyOn(Task, 'deleteOne');
 
 describe('Task service', () => {
 	describe('create task', () => {
@@ -35,6 +36,16 @@ describe('Task service', () => {
 
 			expect(actualTask).toStrictEqual(expectedTask);
 			expect(findTaskSpy).toHaveBeenCalledWith({ email: 'email' });
+		});
+	});
+
+	describe('delete task', () => {
+		it('should delete a task', async () => {
+			deleteTaskSpy.mockResolvedValue({ deletedCount: 1, acknowledged: true });
+
+			await deleteTask('taskId');
+
+			expect(deleteTaskSpy).toHaveBeenCalledWith({ _id: 'taskId' });
 		});
 	});
 });

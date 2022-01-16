@@ -13,11 +13,11 @@ router.post('/login', async (req, res) => {
 		const token = issueToken({ email });
 
 		res.status(200).send({ message: 'Success', data: { token: token } });
-		console.log('Authentication success');
+		console.log('Login success');
 		return;
 	}
 
-	console.log('Authentication failed: Wrong password');
+	console.log('Login failed: Wrong password');
 	res.status(401).send({ message: 'Failure' });
 	return;
 });

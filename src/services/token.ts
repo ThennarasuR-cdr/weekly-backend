@@ -8,13 +8,14 @@ const tokenEncryptionSecret = process.env.TOKEN_ENCRYPTION_SECRET;
 
 export const issueToken = (payload: any): string => {
 	const issuedTime = Date.now();
+	const expirationTime = Date.now() + (3600 * 1000);
 
 	const encodedHeader = base64url.encode(JSON.stringify({
 		alg: 'HS256',
 		typ: 'JWT'
 	}));
 
-	const encodedPayload = base64url.encode(JSON.stringify({ ...payload, issuedTime }));
+	const encodedPayload = base64url.encode(JSON.stringify({ ...payload, issuedTime, expirationTime }));
 
 	const secret = sha256.hmac(tokenEncryptionSecret, `${encodedHeader}.${encodedPayload}`);
 
@@ -23,13 +24,14 @@ export const issueToken = (payload: any): string => {
 	return token;
 };
 
-export const verifyToken = (token: string): boolean => {
+export const verifyToken = (token: string): boolean | string => {
 	const tokenItems = token.split('.');
 
 	let decodedHeader: any;
+	let decodedPayload: any;
 	try {
 		decodedHeader = JSON.parse(base64url.decode(tokenItems[0]));
-		JSON.parse(base64url.decode(tokenItems[1]));
+		decodedPayload = JSON.parse(base64url.decode(tokenItems[1]));
 	} catch (error) {
 		console.error('Error while parsing token items: ', error);
 		return false;
@@ -43,7 +45,12 @@ export const verifyToken = (token: string): boolean => {
 	const generatedSecret = sha256.hmac(tokenEncryptionSecret, `${tokenItems[0]}.${tokenItems[1]}`);
 
 	if (generatedSecret === tokenItems[2]) {
-		return true;
+		if (Date.now() < decodedPayload.expirationTime) {
+			console.log('Token expired');
+			return false;
+		}
+
+		return decodedPayload.email;
 	}
 
 	console.log('Secret is invalid');

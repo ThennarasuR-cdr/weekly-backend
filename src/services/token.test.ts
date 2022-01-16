@@ -29,6 +29,7 @@ describe('Token service', () => {
 		const payload = '{"email": "validEmail","issuedTime": "212112", "expirationTime": "0"}';
 
 		it('should return true for valid token', () => {
+			Date.now = jest.fn().mockReturnValue(-1);
 			mockedBase64Url.decode.mockReturnValueOnce(header);
 			mockedBase64Url.decode.mockReturnValueOnce(payload);
 
@@ -38,7 +39,7 @@ describe('Token service', () => {
 		});
 
 		it('should return false for expired token', () => {
-			Date.now = jest.fn().mockReturnValue(-1);
+			Date.now = jest.fn().mockReturnValue(1);
 			mockedBase64Url.decode.mockReturnValueOnce(header);
 			mockedBase64Url.decode.mockReturnValueOnce(payload);
 

@@ -45,7 +45,7 @@ export const verifyToken = (token: string): boolean | string => {
 	const generatedSecret = sha256.hmac(tokenEncryptionSecret, `${tokenItems[0]}.${tokenItems[1]}`);
 
 	if (generatedSecret === tokenItems[2]) {
-		if (Date.now() < decodedPayload.expirationTime) {
+		if (Date.now() > decodedPayload.expirationTime) {
 			console.log('Token expired');
 			return false;
 		}

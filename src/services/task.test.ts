@@ -3,6 +3,7 @@ import { createTask, deleteTask, getTasks } from './task';
 
 const createTaskSpy = jest.spyOn(Task, 'create');
 const findTaskSpy = jest.spyOn(Task, 'find');
+const findByIdTaskSpy = jest.spyOn(Task, 'findById');
 const deleteTaskSpy = jest.spyOn(Task, 'deleteOne');
 
 describe('Task service', () => {
@@ -40,12 +41,27 @@ describe('Task service', () => {
 	});
 
 	describe('delete task', () => {
-		it('should delete a task', async () => {
-			deleteTaskSpy.mockResolvedValue({ deletedCount: 1, acknowledged: true });
+		beforeEach(() => {
+			jest.clearAllMocks();
+		});
 
-			await deleteTask('taskId');
+		it('should delete the task of the user', async () => {
+			deleteTaskSpy.mockResolvedValue({ deletedCount: 1, acknowledged: true });
+			findByIdTaskSpy.mockResolvedValue({ createdBy: 'email' });
+
+			const result = await deleteTask('email', 'taskId');
 
 			expect(deleteTaskSpy).toHaveBeenCalledWith({ _id: 'taskId' });
+			expect(result).toBeTruthy();
+		});
+
+		it('should not delete the task of the another user', async () => {
+			findByIdTaskSpy.mockResolvedValue({ createdBy: 'email1' });
+
+			const result = await deleteTask('email', 'taskId');
+
+			expect(deleteTaskSpy).not.toHaveBeenCalled();
+			expect(result).toBeFalsy();
 		});
 	});
 });

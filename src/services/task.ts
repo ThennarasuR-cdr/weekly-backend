@@ -24,8 +24,14 @@ export const getTasks = async (email: string): Promise<task[]> => {
 	return mappedTasks;
 };
 
-export const deleteTask = async (taskId: string): Promise<void> => {
-	await Task.deleteOne({ _id: taskId });
+export const deleteTask = async (email: string, taskId: string): Promise<boolean> => {
+	const { createdBy } = await Task.findById(taskId);
 
-	return;
+	if (createdBy === email) {
+		await Task.deleteOne({ _id: taskId });
+		return true;
+	}
+
+	console.log('Task does not exist');
+	return false;
 };

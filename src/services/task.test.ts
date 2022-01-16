@@ -1,10 +1,11 @@
 import Task from '../models/task';
-import { createTask, deleteTask, getTasks } from './task';
+import { createTask, deleteTask, editTask, getTasks } from './task';
 
 const createTaskSpy = jest.spyOn(Task, 'create');
 const findTaskSpy = jest.spyOn(Task, 'find');
 const findByIdTaskSpy = jest.spyOn(Task, 'findById');
 const deleteTaskSpy = jest.spyOn(Task, 'deleteOne');
+const updateTaskSpy = jest.spyOn(Task, 'updateOne');
 
 describe('Task service', () => {
 	describe('create task', () => {
@@ -61,6 +62,48 @@ describe('Task service', () => {
 			const result = await deleteTask('email', 'taskId');
 
 			expect(deleteTaskSpy).not.toHaveBeenCalled();
+			expect(result).toBeFalsy();
+		});
+	});
+
+	describe('Edit task', () => {
+		beforeEach(() => {
+			jest.clearAllMocks();
+		});
+
+		const task = {
+			title: 'title',
+			description: 'desc',
+			completed: undefined,
+			createdAt: undefined,
+			createdBy: undefined,
+			id: 'id'
+		};
+		it('should edit the existing task', async () => {
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			//@ts-ignore
+			findTaskSpy.mockResolvedValue(task);
+			updateTaskSpy.mockResolvedValue({ matchedCount: 1, modifiedCount: 1 } as any);
+
+			const result = await editTask('mail', { ...task, title: 'new title' });
+
+			expect(updateTaskSpy).toHaveBeenCalledWith({ _id: 'id' },
+				{
+					title: 'new title', description: 'desc',
+					completed: undefined,
+					completedAt: undefined
+				});
+			expect(result).toBeTruthy();
+		});
+
+		it('should not edit the task of other users', async () => {
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			//@ts-ignore
+			findTaskSpy.mockResolvedValue(null);
+
+			const result = await editTask('mail', { ...task, title: 'new title' });
+
+			expect(updateTaskSpy).not.toHaveBeenCalled();
 			expect(result).toBeFalsy();
 		});
 	});

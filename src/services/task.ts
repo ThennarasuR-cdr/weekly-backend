@@ -27,11 +27,34 @@ export const getTasks = async (email: string): Promise<task[]> => {
 export const deleteTask = async (email: string, taskId: string): Promise<boolean> => {
 	const { createdBy } = await Task.findById(taskId);
 
-	if (createdBy === email) {
-		await Task.deleteOne({ _id: taskId });
-		return true;
+	if (createdBy !== email) {
+		console.log('Task does not exist');
+		return false;
 	}
 
-	console.log('Task does not exist');
-	return false;
+	await Task.deleteOne({ _id: taskId });
+	return true;
+};
+
+export const editTask = async (email: string, task: task): Promise<boolean> => {
+	const taskToBeEdited = await Task.find({ _id: task.id, email: email });
+
+	if (!taskToBeEdited) {
+		console.log('Task does not exist');
+		return false;
+	}
+
+	await Task.updateOne(
+		{
+			_id: task.id
+		},
+		{
+			title: task.title,
+			description: task.description,
+			completed: task.completed,
+			completedAt: task.completed || task.completedAt
+		}
+	);
+
+	return true;
 };

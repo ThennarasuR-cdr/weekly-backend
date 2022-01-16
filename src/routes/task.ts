@@ -1,6 +1,7 @@
 import express from 'express';
 import validate from '../middleware/validator';
-import { createTask, deleteTask, getTasks } from '../services/task';
+import { createTask, deleteTask, editTask, getTasks } from '../services/task';
+import { task } from '../types/task';
 
 const router = express.Router();
 
@@ -13,6 +14,23 @@ router.post('/task', validate({ required: ['title'] }), async (req, res) => {
 	const taskId = await createTask(title, description, email);
 
 	res.status(200).send({ message: 'Task created successfully', data: { taskId } });
+	return;
+});
+
+router.post('/task/edit', async (req, res) => {
+	const task: task = req.body;
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	//@ts-ignore
+	const email = req.user.email;
+
+	const result = await editTask(email, task);
+
+	if (result) {
+		res.status(200).send({ message: 'Task edited successfully', data: { taskId: task.id } });
+		return;
+	}
+
+	res.status(404).send({ message: 'Task does not exist' });
 	return;
 });
 

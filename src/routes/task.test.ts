@@ -4,6 +4,9 @@ import * as taskService from '../services/task';
 
 const createTaskSpy = jest.spyOn(taskService, 'createTask');
 const getTasksSpy = jest.spyOn(taskService, 'getTasks');
+const deleteTaskSpy = jest.spyOn(taskService, 'deleteTask');
+const editTaskSpy = jest.spyOn(taskService, 'editTask');
+
 jest.mock('../middleware/authenticate', () => (req, res, next) => {
 	req.user = { email: 'email' };
 	next();
@@ -34,4 +37,45 @@ describe('Task router', () => {
 			expect(response.body).toStrictEqual(expectedResponseBody);
 		});
 	});
+
+	describe('delete task', () => {
+		it('should delete the task', async () => {
+			deleteTaskSpy.mockResolvedValue(true);
+
+			const response = await request(app).delete('/task').send({ taskId: 'taskId' });
+
+			expect(response.status).toBe(200);
+			expect(response.body).toStrictEqual({ message: 'Task deleted successfully' });
+		});
+
+		it('should delete the task', async () => {
+			deleteTaskSpy.mockResolvedValue(false);
+
+			const response = await request(app).delete('/task').send({ taskId: 'taskId' });
+
+			expect(response.status).toBe(404);
+			expect(response.body).toStrictEqual({ message: 'Task not found' });
+		});
+	});
+
+	describe('edit task', () => {
+		it('should edit the task', async () => {
+			editTaskSpy.mockResolvedValue(true);
+
+			const response = await request(app).post('/task/edit').send({ id: 'taskId' });
+
+			expect(response.status).toBe(200);
+			expect(response.body).toStrictEqual({ message: 'Task edited successfully', data: { taskId: 'taskId' } });
+		});
+
+		it('should delete the task', async () => {
+			editTaskSpy.mockResolvedValue(false);
+
+			const response = await request(app).post('/task/edit').send({ taskId: 'taskId' });
+
+			expect(response.status).toBe(404);
+			expect(response.body).toStrictEqual({ message: 'Task does not exist' });
+		});
+	});
+
 });

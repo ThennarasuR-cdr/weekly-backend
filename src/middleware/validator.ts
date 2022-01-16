@@ -8,7 +8,18 @@ const validate = (conditions: { [key: string]: string[] }) => {
 
 		if (requiredFields) {
 			emptyFields = requiredFields.filter(field => {
-				if (!body[field]) {
+				const fieldKeys = field.split('.');
+
+				let value = { ...body };
+
+				fieldKeys.forEach(fieldKey => {
+					if (value)
+						value = value[fieldKey];
+					else
+						return true;
+				});
+
+				if (!value) {
 					return true;
 				}
 			});

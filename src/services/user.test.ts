@@ -1,14 +1,15 @@
 import mongoose from 'mongoose';
 
 import User from '../models/user';
-import { findUserByEmail, findUserById } from './user';
+import { findUserByEmail, findUserById, registerUser } from './user';
 
 const findByIdSpy = jest.spyOn(User, 'findById');
 const findOneSpy = jest.spyOn(User, 'findOne');
+const createUserSpy = jest.spyOn(User, 'create');
 
 describe('User service', () => {
 	describe('find User by id', () => {
-		const expectedUser = { id: 'name', email: 'username@mail.com', password: 'password' };
+		const expectedUser = { email: 'username@mail.com', password: 'password' };
 		findByIdSpy.mockResolvedValue(expectedUser);
 
 		it('should find the user by id', async () => {
@@ -23,7 +24,7 @@ describe('User service', () => {
 
 	describe('find User by email', () => {
 		const email = 'username@mail.com';
-		const expectedUser = { id: 'name', email, password: 'password' };
+		const expectedUser = { email, password: 'password' };
 		findOneSpy.mockResolvedValue(expectedUser);
 
 		it('should find the user by email', async () => {
@@ -33,4 +34,20 @@ describe('User service', () => {
 			expect(User.findOne).toBeCalledWith({ email });
 		});
 	});
+
+	describe('register user', () => {
+		const expectedUser = { email: 'username@mail.com', password: 'password' };
+
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		//@ts-ignore
+		createUserSpy.mockResolvedValue(expectedUser);
+
+		it('should register the user successfully', async () => {
+			const email = await registerUser(expectedUser.email, expectedUser.password);
+
+			expect(email).toStrictEqual(expectedUser.email);
+			expect(User.create).toBeCalledWith(expectedUser);
+		});
+	});
+
 });

@@ -15,4 +15,10 @@ const findUserByEmail = async (email: string): Promise<UserType> => {
 	return user;
 };
 
-export { findUserById, findUserByEmail };
+const registerUser = async (email: string, password: string): Promise<string> => {
+	const user: UserType = await User.create({ email, password });
+
+	return user.email;
+};
+
+export { findUserById, findUserByEmail, registerUser };

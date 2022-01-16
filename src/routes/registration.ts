@@ -1,9 +1,10 @@
 import express from 'express';
+import validate from '../middleware/validator';
 import { findUserByEmail, registerUser } from '../services/user';
 
 const router = express.Router();
 
-router.post('/register', async (req, res) => {
+router.post('/register', validate({ required: ['email', 'password'] }), async (req, res) => {
 	const { email, password } = req.body;
 
 	const user = await findUserByEmail(email);

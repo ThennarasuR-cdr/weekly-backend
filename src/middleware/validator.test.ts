@@ -7,8 +7,20 @@ describe('Validator', () => {
 	const mockStatus = jest.fn().mockReturnValue({ send: mockSend });
 	const response = { status: mockStatus };
 
+	beforeEach(() => {
+		jest.clearAllMocks();
+	});
+
 	it('should call next if all the required fields are present', () => {
 		const validatorMiddleware = validate({ 'required': ['email', 'password', 'user.email'] });
+
+		validatorMiddleware(request, response, mockNext);
+
+		expect(mockNext).toBeCalledTimes(1);
+	});
+
+	it('should call next if if there are no are present', () => {
+		const validatorMiddleware = validate({});
 
 		validatorMiddleware(request, response, mockNext);
 

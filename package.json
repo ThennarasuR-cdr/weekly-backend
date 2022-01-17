@@ -27,7 +27,11 @@
         "lines": 100,
         "statements": -10
       }
-    }
+    },
+    "coveragePathIgnorePatterns": [
+      "./src/models",
+      "./src/types"
+    ]
   },
   "author": "",
   "license": "ISC",

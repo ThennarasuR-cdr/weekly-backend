@@ -1,6 +1,6 @@
 import express from 'express';
 import validate from '../middleware/validator';
-import { completeTask, createTask, deleteTask, editTask, getTasks } from '../services/task';
+import { completeTask, createTask, deleteTask, editTask, getTasks, setTaskToIncomplete } from '../services/task';
 import { task } from '../types/task';
 
 const router = express.Router();
@@ -44,6 +44,23 @@ router.post('/task/complete', validate({ required: ['taskId'] }), async (req, re
 
 	if (result) {
 		res.status(200).send({ message: 'Task completed successfully', data: { taskId } });
+		return;
+	}
+
+	res.status(404).send({ message: 'Task does not exist' });
+	return;
+});
+
+router.post('/task/incomplete', validate({ required: ['taskId'] }), async (req, res) => {
+	const { taskId } = req.body;
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	//@ts-ignore
+	const email = req.user.email;
+
+	const result = await setTaskToIncomplete(email, taskId);
+
+	if (result) {
+		res.status(200).send({ message: 'Task set to incomplete successfully', data: { taskId } });
 		return;
 	}
 

@@ -80,7 +80,7 @@ describe('Task service', () => {
 			createdBy: undefined,
 			id: 'id'
 		};
-		it('should edit the existing task', async () => {
+		it('should edit the existing task while completion', async () => {
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			//@ts-ignore
 			findTaskSpy.mockResolvedValue(task);
@@ -93,6 +93,23 @@ describe('Task service', () => {
 					title: 'new title', description: 'desc',
 					completed: true,
 					completedAt: new Date('1970-01-01T00:00:01.111Z')
+				});
+			expect(result).toBeTruthy();
+		});
+
+		it('should edit the existing task while incompletion', async () => {
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			//@ts-ignore
+			findTaskSpy.mockResolvedValue(task);
+			updateTaskSpy.mockResolvedValue({ matchedCount: 1, modifiedCount: 1 } as any);
+
+			const result = await taskService.editTask('mail', { ...task, title: 'new title', completed: false });
+
+			expect(updateTaskSpy).toHaveBeenCalledWith({ _id: 'id' },
+				{
+					title: 'new title', description: 'desc',
+					completed: false,
+					completedAt: null
 				});
 			expect(result).toBeTruthy();
 		});

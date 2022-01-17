@@ -7,6 +7,7 @@ const getTasksSpy = jest.spyOn(taskService, 'getTasks');
 const deleteTaskSpy = jest.spyOn(taskService, 'deleteTask');
 const editTaskSpy = jest.spyOn(taskService, 'editTask');
 const completeTaskSpy = jest.spyOn(taskService, 'completeTask');
+const incompleteTaskSpy = jest.spyOn(taskService, 'setTaskToIncomplete');
 
 jest.mock('../middleware/authenticate', () => (req, res, next) => {
 	req.user = { email: 'email' };
@@ -93,6 +94,26 @@ describe('Task router', () => {
 			completeTaskSpy.mockResolvedValue(false);
 
 			const response = await request(app).post('/task/complete').send({ taskId: 'taskId' });
+
+			expect(response.status).toBe(404);
+			expect(response.body).toStrictEqual({ message: 'Task does not exist' });
+		});
+	});
+
+	describe('incomplete task', () => {
+		it('should set the task to incomplete', async () => {
+			incompleteTaskSpy.mockResolvedValue(true);
+
+			const response = await request(app).post('/task/incomplete').send({ taskId: 'taskId' });
+
+			expect(response.status).toBe(200);
+			expect(response.body).toStrictEqual({ message: 'Task set to incomplete successfully', data: { taskId: 'taskId' } });
+		});
+
+		it('should return 404 when the task is not found', async () => {
+			incompleteTaskSpy.mockResolvedValue(false);
+
+			const response = await request(app).post('/task/incomplete').send({ taskId: 'taskId' });
 
 			expect(response.status).toBe(404);
 			expect(response.body).toStrictEqual({ message: 'Task does not exist' });

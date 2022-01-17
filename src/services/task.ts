@@ -52,9 +52,13 @@ export const editTask = async (email: string, task: task): Promise<boolean> => {
 			title: task.title,
 			description: task.description,
 			completed: task.completed,
-			completedAt: task.completed || task.completedAt
+			completedAt: task.completed && task.completedAt
 		}
 	);
 
 	return true;
+};
+
+export const completeTask = async (email: string, taskId: string): Promise<boolean> => {
+	return await editTask(email, { id: taskId, completed: true, completedAt: new Date(Date.now()) } as task);
 };

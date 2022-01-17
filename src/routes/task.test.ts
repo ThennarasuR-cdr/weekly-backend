@@ -6,6 +6,7 @@ const createTaskSpy = jest.spyOn(taskService, 'createTask');
 const getTasksSpy = jest.spyOn(taskService, 'getTasks');
 const deleteTaskSpy = jest.spyOn(taskService, 'deleteTask');
 const editTaskSpy = jest.spyOn(taskService, 'editTask');
+const completeTaskSpy = jest.spyOn(taskService, 'completeTask');
 
 jest.mock('../middleware/authenticate', () => (req, res, next) => {
 	req.user = { email: 'email' };
@@ -48,7 +49,7 @@ describe('Task router', () => {
 			expect(response.body).toStrictEqual({ message: 'Task deleted successfully' });
 		});
 
-		it('should delete the task', async () => {
+		it('should return 404 when the task is not found', async () => {
 			deleteTaskSpy.mockResolvedValue(false);
 
 			const response = await request(app).delete('/task').send({ taskId: 'taskId' });
@@ -68,10 +69,30 @@ describe('Task router', () => {
 			expect(response.body).toStrictEqual({ message: 'Task edited successfully', data: { taskId: 'taskId' } });
 		});
 
-		it('should delete the task', async () => {
+		it('should return 404 when the task is not found', async () => {
 			editTaskSpy.mockResolvedValue(false);
 
-			const response = await request(app).post('/task/edit').send({ taskId: 'taskId' });
+			const response = await request(app).post('/task/edit').send({ id: 'taskId' });
+
+			expect(response.status).toBe(404);
+			expect(response.body).toStrictEqual({ message: 'Task does not exist' });
+		});
+	});
+
+	describe('complete task', () => {
+		it('should complete the task', async () => {
+			completeTaskSpy.mockResolvedValue(true);
+
+			const response = await request(app).post('/task/complete').send({ taskId: 'taskId' });
+
+			expect(response.status).toBe(200);
+			expect(response.body).toStrictEqual({ message: 'Task completed successfully', data: { taskId: 'taskId' } });
+		});
+
+		it('should return 404 when the task is not found', async () => {
+			completeTaskSpy.mockResolvedValue(false);
+
+			const response = await request(app).post('/task/complete').send({ taskId: 'taskId' });
 
 			expect(response.status).toBe(404);
 			expect(response.body).toStrictEqual({ message: 'Task does not exist' });

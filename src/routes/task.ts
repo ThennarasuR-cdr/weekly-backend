@@ -1,6 +1,6 @@
 import express from 'express';
 import validate from '../middleware/validator';
-import { createTask, deleteTask, editTask, getTasks } from '../services/task';
+import { completeTask, createTask, deleteTask, editTask, getTasks } from '../services/task';
 import { task } from '../types/task';
 
 const router = express.Router();
@@ -17,7 +17,7 @@ router.post('/task', validate({ required: ['title'] }), async (req, res) => {
 	return;
 });
 
-router.post('/task/edit', async (req, res) => {
+router.post('/task/edit', validate({ required: ['id'] }), async (req, res) => {
 	const task: task = req.body;
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	//@ts-ignore
@@ -27,6 +27,23 @@ router.post('/task/edit', async (req, res) => {
 
 	if (result) {
 		res.status(200).send({ message: 'Task edited successfully', data: { taskId: task.id } });
+		return;
+	}
+
+	res.status(404).send({ message: 'Task does not exist' });
+	return;
+});
+
+router.post('/task/complete', validate({ required: ['taskId'] }), async (req, res) => {
+	const { taskId } = req.body;
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	//@ts-ignore
+	const email = req.user.email;
+
+	const result = await completeTask(email, taskId);
+
+	if (result) {
+		res.status(200).send({ message: 'Task completed successfully', data: { taskId } });
 		return;
 	}
 

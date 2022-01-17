@@ -62,3 +62,7 @@ export const editTask = async (email: string, task: task): Promise<boolean> => {
 export const completeTask = async (email: string, taskId: string): Promise<boolean> => {
 	return await editTask(email, { id: taskId, completed: true, completedAt: new Date(Date.now()) } as task);
 };
+
+export const setTaskToIncomplete = async (email: string, taskId: string): Promise<boolean> => {
+	return await editTask(email, { id: taskId, completed: false, completedAt: null } as task);
+};

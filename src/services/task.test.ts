@@ -123,4 +123,19 @@ describe('Task service', () => {
 			expect(editTaskSpy).toBeCalledWith('email', { id: '121', completed: true, completedAt: new Date('1970-01-01T00:00:01.111Z') });
 		});
 	});
+
+	describe('set task to incomplete', () => {
+		beforeEach(() => {
+			jest.clearAllMocks();
+		});
+
+		it('should set the task to incomplete', async () => {
+			const editTaskSpy = jest.spyOn(taskService, 'editTask').mockResolvedValue(true);
+
+			const result = await taskService.setTaskToIncomplete('email', '121');
+
+			expect(result).toBeTruthy();
+			expect(editTaskSpy).toBeCalledWith('email', { id: '121', completed: false, completedAt: null });
+		});
+	});
 });
